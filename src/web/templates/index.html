@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Language App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        #video {
+            border: 1px solid black;
+            width: 640px;
+            height: 480px;
+            margin: 20px auto;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Sign Language Data Collection</h1>
+<div id="video">
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+</div>
+<div id="controls">
+    <select id="action">
+        <option value="hello">Hello</option>
+        <option value="thanks">Thanks</option>
+        <option value="iloveyou">I Love You</option>
+        <option value="name">Name</option>
+    </select>
+    <input type="number" id="sequence" min="0" placeholder="Sequence Number">
+    <button onclick="startCollection()">Start Collection</button>
+</div>
+<script>
+    function startCollection() {
+        const action = document.getElementById('action').value;
+        const sequence = document.getElementById('sequence').value;
+        if (sequence === "") {
+            alert("Please enter a sequence number");
+            return;
+        }
+        fetch('/collect_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=${action}&sequence=${sequence}`
+        })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>

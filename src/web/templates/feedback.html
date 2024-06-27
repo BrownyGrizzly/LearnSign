@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Language Detection</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+        .container {
+            display: flex;
+            width: 90%;
+            height: 80vh;
+            box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .text-section {
+            width: 40%;
+            padding: 20px;
+        }
+        .image-section {
+            width: 60%;
+        }
+        img {
+            width: 100%;
+            height: auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin: 20px 0;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #6c63ff;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="text-section">
+        <h1>Học ngôn ngữ kí hiệu</h1>
+        <form id="feedbackForm" style="margin: 20px">
+            <label for="word">Chọn từ:</label>
+            <select id="word" name="word">
+                <option value="hello">Hello</option>
+                <option value="thanks">Thanks</option>
+                <option value="iloveyou">I Love You</option>
+                <option value="name">Name</option>
+            </select>
+            <br>
+            <button type="button" onclick="startPrediction()" style="width: 75px; height: 50px; margin: 30px">Bắt đầu đánh giá</button>
+        </form>
+
+        <h2 id="result"></h2>
+    </div>
+
+    <div class="image-section">
+        <img src="{{ url_for('video_feed') }}" alt="Video Feed">
+    </div>
+</div>
+
+<script>
+    function startPrediction() {
+        var word = document.getElementById('word').value;
+        fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ word: word })
+        })
+            .then(response => response.json())
+            .then(data => {
+                var resultElement = document.getElementById('result');
+                if (data.status === 'success') {
+                    if (data.action === word) {
+                        resultElement.innerText = `Rất tốt! Ký hiệu khớp với: ${data.action}`;
+                    } else {
+                        resultElement.innerText = `Sai rồi! Từ được chọn là: ${word}, nhưng ký hiệu giống với: ${data.action}`;
+                    }
+                } else {
+                    resultElement.innerText = `Lỗi: ${data.message}`;
+                }
+            });
+    }
+</script>
+</body>
+</html>
